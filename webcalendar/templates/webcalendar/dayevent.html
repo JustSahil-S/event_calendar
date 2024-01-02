@@ -1,0 +1,75 @@
+{% extends "webcalendar/layout.html" %}
+{% load static %}
+
+{% block body %}
+<style>
+    h2 {
+                font-size: 50px;
+                color: black;
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;}
+</style>
+<form action="/addEvent" method="post">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="title">
+    <input type="text" name="subject" placeholder="subject">
+    <input type="text" name="startHour" placeholder="startHour">
+    <input type="text" name="startMin" placeholder="startMin">
+    <input type="text" name="endHour" placeholder="endHour">
+    <input type="text" name="endMin" placeholder="endMin">
+    <input type="hidden" name="day" value="{{ day }}">
+    <input type="hidden" name="month" value="{{ month }}">
+    <input type="hidden" name="year" value="{{ year }}">
+    <select name="calendar">
+        {% for calendar in calendars %}
+            <option value="{{ calendar.id }}">{{ calendar.title }}</option>
+        {% endfor %}
+      </select>
+    <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="Add Event"> 
+</form>
+<h2>{{ month }}-{{day}}-{{ year }}</h2>
+    {% for event in events %}
+        <div style="background-color: rgb(237, 113, 113) ; display: inline-block; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+            <form action="/editEvent" method="post" style="display: block" id="edit{{ event.id}}">
+                {% csrf_token %}
+            <input type="hidden" name="day" value="{{ day }}">
+            <input type="hidden" name="month" value="{{ month }}">
+            <input type="hidden" name="year" value="{{ year }}">
+            <input type="hidden" name="event" value="{{ event.id }}">
+            <input type="text" name="startHour" value="{{ event.startHour }}" style="width: 2.5%;text-align: right; padding: 0px; background-color: rgb(237, 113, 113); border: 1px solid gray; margin-bottom: 10px;" maxlength="2">
+            : 
+            <input type="text" name="startMin" value="{{ event.startMin }}" style="width: 2.5%; padding: 0px; background-color: rgb(237, 113, 113); border: 1px solid gray; margin-bottom: 10px;" maxlength="2">
+            ->
+            <input type="text" name="endHour" value="{{ event.endHour }}" style="width: 2.5%;text-align: right; padding: 0px; background-color: rgb(237, 113, 113) ; border: 1px solid gray;" maxlength="2">
+            :
+            <input type="text" name="endMin" value="{{ event.endMin }}" style="width: 2.5%; padding: 0px; background-color: rgb(237, 113, 113); border: 1px solid gray;" maxlength="2"> 
+             &nbsp;   
+            <input type="text" name="title" value="{{ event.title }}" style="background-color: rgb(237, 113, 113); border: 1px solid gray; font-size: large; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+            &nbsp;From:
+            <input type="text" name="calendar" value="{{ event.calendar.title }}" readonly="readonly" style="padding: 0px; background-color: rgb(237, 113, 113); border: none;" maxlength="2"> 
+            &nbsp; Created By:
+            <input type="text" name="owner" value="{{ event.owner }}" readonly="readonly" style="padding: 0px; background-color: rgb(237, 113, 113); border: none;" maxlength="2"> 
+            <br>
+            <input type="text" name="subject" value="{{ event.subject }}" style="background-color: rgb(237, 113, 113); border: 1px solid gray; width: 50%; margin-left: 2%; margin-bottom: 10px;">
+            <br>
+            <br>
+            </form>
+            <form action="/deleteEvent" method="post" style="display: block;">
+                {% csrf_token %}
+            <input type="hidden" name="day" value="{{ day }}">
+            <input type="hidden" name="month" value="{{ month }}">
+            <input type="hidden" name="year" value="{{ year }}">
+            <input type="hidden" name="event" value="{{ event.id }}">
+            {% if event.owner == user %}
+            <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="X">
+            <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="Edit" form="edit{{ event.id }}">
+            {% endif %}
+
+            </form>
+        </div>
+        <br>
+    {% endfor %}
+    <br>
+    <button onclick="location.href='/'"> Back </button>
+
+
+{% endblock %}

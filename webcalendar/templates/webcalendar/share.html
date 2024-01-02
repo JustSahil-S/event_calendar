@@ -1,0 +1,49 @@
+{% extends "webcalendar/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<form action="/newCalendar" method="post" style="float: right; margin-right: 10px;">
+    {% csrf_token %}
+<input type="text" name="title" >
+<input type="submit" style="background-color: rgb(0, 0, 0); color: white; margin-right: 10px;" value="Create Calendar" >
+</form>
+<br>
+<br>
+
+<form action="/shareWith" method="post">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Username">
+    <input type="hidden" name="status" value="Add">
+    <select name="calendar">
+        {% for calendar in calendars %}
+            <option value="{{ calendar.id }}">{{ calendar.title }}</option>
+        {% endfor %}
+      </select>
+    <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="+"> 
+</form>
+<br>
+Shared Users:
+<br>
+{% for calendar in calendars %}
+{% if calendar.sharedUsers %}
+<div style="background-color: lightgray; margin-bottom: 10px;">
+{{ calendar.title }}
+<br>
+{% for user in calendar.sharedUsers.all %}
+<div style="background-color: rgb(237, 113, 113) ; display: inline-block; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+<form action="/shareWith" method="post">
+    {% csrf_token %}
+    <input type="text" name="username" value="{{ user.username }}" readonly="readonly" style="width: 75%; padding: 0px; background-color: rgb(237, 113, 113); border: none; margin-bottom: 10px;">
+    <input type="hidden" name="status" value="Remove">
+    <input type="hidden" name="calendar" value="{{ calendar.id }}">
+    <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="X"> 
+</form>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+<button onclick="location.href='/'"> Back </button>
+
+{% endblock %}
