@@ -8,50 +8,57 @@
                 color: black;
                 font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;}
 </style>
-<form action="/addEvent" method="post">
-    {% csrf_token %}
-    <input type="text" name="title" placeholder="title">
-    <input type="text" name="subject" placeholder="subject">
-    <input type="text" name="startHour" placeholder="startHour">
-    <input type="text" name="startMin" placeholder="startMin">
-    <input type="text" name="endHour" placeholder="endHour">
-    <input type="text" name="endMin" placeholder="endMin">
-    <input type="hidden" name="day" value="{{ day }}">
-    <input type="hidden" name="month" value="{{ month }}">
-    <input type="hidden" name="year" value="{{ year }}">
-    <select name="calendar">
-        {% for calendar in calendars %}
-            <option value="{{ calendar.id }}">{{ calendar.title }}</option>
-        {% endfor %}
-      </select>
-    <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="Add Event"> 
-</form>
-<h2>{{ month }}-{{day}}-{{ year }}</h2>
+<div style="background-color: lightgrey; display: inline-block; padding: 10px; border-radius: 10px;">
+    <form action="/addEvent" method="post">
+        {% csrf_token %}
+        <input type="text" name="startHour" placeholder="HH" style="width: 2em;text-align: right; padding: 0px;" maxlength="2" required>
+        :
+        <input type="text" name="startMin" placeholder="MM" style="width: 2em; padding: 0px;" maxlength="2" required>
+        ->
+        <input type="text" name="endHour" placeholder="HH" style="width: 2em;text-align: right; padding: 0px;" maxlength="2" required>
+        :
+        <input type="text" name="endMin" placeholder="MM" style="width: 2em; padding: 0px;" maxlength="2" required>
+        &nbsp;
+        <input type="text" name="title" placeholder="title" style="width: 35em; padding: 0px;" required> 
+        &nbsp;Calendar: 
+        <select name="calendar">
+            {% for calendar in calendars %}
+                <option value="{{ calendar.id }}">{{ calendar.title }}[{{calendar.owner}}]</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="textarea" name="details" placeholder="details" style="width: 50em; margin: 10px; height: 3em;">
+        <br>
+        <input type="hidden" name="day" value="{{ day }}">
+        <input type="hidden" name="month" value="{{ month }}">
+        <input type="hidden" name="year" value="{{ year }}">
+        <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="Add Event"> 
+    </form>
+</div>
+<h2>Events for {{ month }}-{{day}}-{{ year }}</h2>
     {% for event in events %}
-        <div style="background-color: rgb(237, 113, 113) ; display: inline-block; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+        <div style="background-color: {{ event.calendar.color }}; display: inline-block; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
             <form action="/editEvent" method="post" style="display: block" id="edit{{ event.id}}">
                 {% csrf_token %}
             <input type="hidden" name="day" value="{{ day }}">
             <input type="hidden" name="month" value="{{ month }}">
             <input type="hidden" name="year" value="{{ year }}">
             <input type="hidden" name="event" value="{{ event.id }}">
-            <input type="text" name="startHour" value="{{ event.startHour }}" style="width: 2.5%;text-align: right; padding: 0px; background-color: rgb(237, 113, 113); border: 1px solid gray; margin-bottom: 10px;" maxlength="2">
+            <input type="text" name="startHour" value="{{ event.startHour }}" style="width: 2em;text-align: right; padding: 0px; background-color: {{ event.calendar.color }}; border: 1px solid gray; margin-bottom: 10px;" maxlength="2">
             : 
-            <input type="text" name="startMin" value="{{ event.startMin }}" style="width: 2.5%; padding: 0px; background-color: rgb(237, 113, 113); border: 1px solid gray; margin-bottom: 10px;" maxlength="2">
+            <input type="text" name="startMin" value="{{ event.startMin }}" style="width: 2em; padding: 0px; background-color: {{ event.calendar.color }}; border: 1px solid gray; margin-bottom: 10px;" maxlength="2">
             ->
-            <input type="text" name="endHour" value="{{ event.endHour }}" style="width: 2.5%;text-align: right; padding: 0px; background-color: rgb(237, 113, 113) ; border: 1px solid gray;" maxlength="2">
+            <input type="text" name="endHour" value="{{ event.endHour }}" style="width: 2em;text-align: right; padding: 0px;background-color: {{ event.calendar.color }} ; border: 1px solid gray;" maxlength="2">
             :
-            <input type="text" name="endMin" value="{{ event.endMin }}" style="width: 2.5%; padding: 0px; background-color: rgb(237, 113, 113); border: 1px solid gray;" maxlength="2"> 
+            <input type="text" name="endMin" value="{{ event.endMin }}" style="width: 2em; padding: 0px; background-color: {{ event.calendar.color }}; border: 1px solid gray;" maxlength="2"> 
              &nbsp;   
-            <input type="text" name="title" value="{{ event.title }}" style="background-color: rgb(237, 113, 113); border: 1px solid gray; font-size: large; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
-            &nbsp;From:
-            <input type="text" name="calendar" value="{{ event.calendar.title }}" readonly="readonly" style="padding: 0px; background-color: rgb(237, 113, 113); border: none;" maxlength="2"> 
-            &nbsp; Created By:
-            <input type="text" name="owner" value="{{ event.owner }}" readonly="readonly" style="padding: 0px; background-color: rgb(237, 113, 113); border: none;" maxlength="2"> 
+            <input type="text" name="title" value="{{ event.title }}" style="width: 35em; background-color: {{ event.calendar.color }}; border: 1px solid gray; font-weight: bold; margin-bottom: 10px;">
+            &nbsp;Calendar:
+            <input type="text" name="calendar" value="{{ event.calendar.title }}" readonly="readonly" style="padding: 0px; background-color: {{ event.calendar.color }}; border: none;" maxlength="2"> 
+            &nbsp; Created by:
+            <input type="text" name="owner" value="{{ event.owner }}" readonly="readonly" style="padding: 0px; background-color: {{ event.calendar.color }}; border: none;" maxlength="2"> 
             <br>
-            <input type="text" name="subject" value="{{ event.subject }}" style="background-color: rgb(237, 113, 113); border: 1px solid gray; width: 50%; margin-left: 2%; margin-bottom: 10px;">
-            <br>
-            <br>
+            <input type="textarea" name="details" value="{{ event.details }}" style="background-color: {{ event.calendar.color }}; border: 1px solid gray; width: 50em; margin: 10px; height: 3em;">
             </form>
             <form action="/deleteEvent" method="post" style="display: block;">
                 {% csrf_token %}

@@ -9,6 +9,7 @@ class User(AbstractUser):
 
 class Calendar(models.Model):
     owner = models.ForeignKey("User", on_delete=models.CASCADE, related_name="calendars")
+    color = models.CharField(max_length=100, default = "#D3D3D3")
     sharedUsers = models.ManyToManyField("User", related_name="sharedUsers", blank=True)
     title = models.CharField(max_length=100)
     def Calendar_Attributes(self):
@@ -23,7 +24,7 @@ class Event(models.Model):
     month = models.CharField(max_length=255)
     year = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
-    subject = models.CharField(max_length=255) 
+    details = models.CharField(max_length=255) 
     calendar = models.ForeignKey("Calendar", on_delete=models.CASCADE, related_name="events")
     owner = models.ForeignKey("User", on_delete=models.CASCADE, related_name="created_events")
     def Event_Attributes(self):

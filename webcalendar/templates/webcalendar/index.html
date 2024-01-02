@@ -45,9 +45,14 @@
     </head>
     <body>
         <div style="margin-bottom: 2%;">
-        <input style="size: 50px;" id = "month" placeholder="month"></input>
-        <input style="size: 50px;" id = "year" placeholder="year"></input>
-        <button style="background-color: rgb(0, 0, 0); color: white;" id = "next"> Display </button>
+        <button style="background-color: green; color: white;" id = "btn_today"> Today </button>
+        <button style="background-color: rgb(0, 0, 0); color: white;" id = "btn_cur_month"> Current Month </button>
+        <!-- <button style="background-color: rgb(0, 0, 0); color: white;" id = "btn_cur_year"> Current Year </button> -->
+        <div style="display:inline-block; width: 40em; position: absolute;left: 50%;right: 50%;">
+        <input style="size: 50px; width: 5ch;" id = "month" placeholder="month"></input>
+        <input style="size: 50px; width: 5ch;" id = "year" placeholder="year"></input>
+        <button style="background-color: rgb(0, 0, 0); color: white;" id = "display"> Display </button>
+        </div>
         <form action="/share" method="post" style="float: right; margin-left: 10px;">
             {% csrf_token %}
         <input type="submit" style="background-color: rgb(0, 0, 0); color: white; float: right; margin-left: 5px;" value="Manage">

@@ -72,17 +72,25 @@ def index(request, calendar_title=None):
     return render(request, "webcalendar/index.html", 
                 {"calendar": monthCalendar})
 
-def get_calendar(request, yearSelection, monthSelection):
+def get_calendar_month(request, yearSelection, monthSelection):
     CalendarObjs = Calendar.objects.filter(Q(owner = User.objects.get(username = request.user.username)) | Q(sharedUsers = User.objects.get(username = request.user.username)))
     EventList = []
     for ev in Event.objects.filter(calendar__in=CalendarObjs, year=yearSelection, month=monthSelection):
         EventList.append(ev.Event_Attributes())
     return JsonResponse({"calendar": calendar.HTMLCalendar().formatmonth(yearSelection, monthSelection), "Events": EventList})
 
+def get_calendar_year(request, yearSelection):
+    CalendarObjs = Calendar.objects.filter(Q(owner = User.objects.get(username = request.user.username)) | Q(sharedUsers = User.objects.get(username = request.user.username)))
+    EventList = []
+    for ev in Event.objects.filter(calendar__in=CalendarObjs, year=yearSelection):
+        EventList.append(ev.Event_Attributes())
+    return JsonResponse({"calendar": calendar.HTMLCalendar().formatyear(yearSelection), "Events": EventList})
+
 
 def day_view(request, year, month, day):
-    CalendarObjs = Calendar.objects.filter(Q(owner = User.objects.get(username = request.user.username)) | Q(sharedUsers = User.objects.get(username = request.user.username)))
+    CalendarObjs = Calendar.objects.filter(Q(owner = User.objects.get(username = request.user.username)) | Q(sharedUsers = User.objects.get(username = request.user.username))).distinct()
     Events = Event.objects.filter(calendar__in=CalendarObjs, year = year, month = month, day = day)
+    #print(CalendarObjs)
     netTimeList = []
     EventList = []
     for event in Events:
@@ -106,7 +114,7 @@ def logout_view(request):
 
 def add_event(request):
     title = request.POST['title']
-    subject = request.POST['subject']
+    details = request.POST['details']
     startMin = request.POST['startMin']
     startHour = request.POST['startHour']
     endMin = request.POST['endMin']
@@ -117,7 +125,7 @@ def add_event(request):
     calendar = request.POST['calendar']
     Event.objects.create(
         title = title, 
-        subject = subject, 
+        details = details, 
         startMin = startMin, 
         startHour = startHour,
         endMin = endMin,
@@ -146,14 +154,14 @@ def edit_event(request):
     endMin = request.POST['endMin']
     endHour = request.POST['endHour']
     title = request.POST['title']
-    subject = request.POST['subject']
+    details = request.POST['details']
     item = Event.objects.filter(id=event)[0]
     item.startMin = startMin
     item.startHour = startHour
     item.endMin = endMin
     item.endHour = endHour
     item.title = title
-    item.subject = subject
+    item.details = details
     item.save()
     return HttpResponseRedirect(f"/{year}/{month}/{day}")
 def new_calendar(request):
@@ -181,4 +189,10 @@ def share_with(request):
     else: 
         return HttpResponse("You are not the Owner of this Calendar")
     
-
+def color(request):
+    print(request.POST["color"])
+    calendar = Calendar.objects.get(id = request.POST["calendar"])
+    if calendar.owner == request.user:
+        calendar.color = request.POST["color"]
+        calendar.save()
+    return HttpResponseRedirect(f"/share")

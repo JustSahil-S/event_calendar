@@ -5,13 +5,13 @@
 
 <form action="/newCalendar" method="post" style="float: right; margin-right: 10px;">
     {% csrf_token %}
-<input type="text" name="title" >
+<input type="text" name="title" placeholder="calendar name" >
 <input type="submit" style="background-color: rgb(0, 0, 0); color: white; margin-right: 10px;" value="Create Calendar" >
 </form>
 <br>
 <br>
 
-<form action="/shareWith" method="post">
+<!-- <form action="/shareWith" method="post">
     {% csrf_token %}
     <input type="text" name="username" placeholder="Username">
     <input type="hidden" name="status" value="Add">
@@ -21,27 +21,42 @@
         {% endfor %}
       </select>
     <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="+"> 
-</form>
-<br>
-Shared Users:
+</form> -->
 <br>
 {% for calendar in calendars %}
 {% if calendar.sharedUsers %}
-<div style="background-color: lightgray; margin-bottom: 10px;">
-{{ calendar.title }}
+<div style="background-color: lightgray; margin-bottom: 10px; min-height: 10vh; padding: 10px; border-radius: 10px;">
+Calendar: {{ calendar.title }}
 <br>
 {% for user in calendar.sharedUsers.all %}
-<div style="background-color: rgb(237, 113, 113) ; display: inline-block; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+<div style="background-color: {{ calendar.color }}; display: inline-block; padding: 10px; border-radius: 10px; margin: 10px;">
 <form action="/shareWith" method="post">
     {% csrf_token %}
-    <input type="text" name="username" value="{{ user.username }}" readonly="readonly" style="width: 75%; padding: 0px; background-color: rgb(237, 113, 113); border: none; margin-bottom: 10px;">
+    <input type="text" name="username" value="{{ user.username }}" readonly="readonly" style="width: 75%; padding: 0px; background-color: {{calendar.color}}; border: none; margin-bottom: 10px;">
     <input type="hidden" name="status" value="Remove">
     <input type="hidden" name="calendar" value="{{ calendar.id }}">
     <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="X"> 
 </form>
 </div>
 {% endfor %}
+<br>
+<div style="display: inline-block; margin: 10px">
+    <form action="/shareWith" method="post" style="display: inline-block; margin-left: 10px;">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username">
+        <input type="hidden" name="status" value="Add">
+        <input type="hidden" value="{{ calendar.id }}" name="calendar">
+        <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="+"> 
+    </form>
+    <form action="/color" method="post" style="display: inline-block; margin-left: 30px;">
+        {% csrf_token %}
+        <input type="color" name="color" value="{{calendar.color}}" style="padding: 0px; vertical-align: middle; border: none; background: none;">
+        <input type="hidden" value="{{ calendar.id }}" name="calendar">
+        <input type="submit" style="background-color: rgb(0, 0, 0); color: white;" value="Change Color"> 
+    </form> 
 </div>
+</div>
+
 {% endif %}
 {% endfor %}
 <button onclick="location.href='/'"> Back </button>
